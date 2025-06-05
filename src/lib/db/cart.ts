@@ -1,5 +1,5 @@
 import { Prisma } from "@prisma/client";
-import { cookies } from "next/dist/client/components/headers";
+import { cookies } from "next/headers";
 import { prisma } from "./prisma";
 
 export type CartWithProducts = Prisma.CartGetPayload<{
