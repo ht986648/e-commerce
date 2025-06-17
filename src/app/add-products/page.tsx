@@ -1,69 +1,77 @@
-
-import { prisma } from '@/lib/db/prisma';
-import { redirect } from 'next/navigation';
-import React from 'react';
 import FormSubmitButton from '@/components/formSubmitButtonts';
-const Page = () => {
-  async function AddProducts(formData: FormData) {
-    "use server";
+import { prisma } from "@/lib/db/prisma";
+import { getServerSession } from "next-auth";
+import { redirect } from "next/navigation";
+import { authOptions } from "../api/auth/[...nextauth]/route";
 
-    const name = formData.get("name")?.toString();
-    const description = formData.get("description")?.toString();
-    const imageUrl = formData.get("imageUrl")?.toString();
-    const price = Number(formData.get("price") || 0);
-    // throw new Error("Simulated failure"); // ✅ this will trigger error.tsx
-    if (!name || !description || !imageUrl || !price) {
-      console.error("Error during data fetching");
-      return;
-    }
+export const metadata = {
+  title: "Add Product - Flowmazon",
+};
 
-    await prisma.product.create({
-      data: { name, description, imageUrl, price },
-    });
+async function addProduct(formData: FormData) {
+  "use server";
 
-    redirect('/');
+  const session = await getServerSession(authOptions);
+
+  if (!session) {
+    redirect("/api/auth/signin?callbackUrl=/add-products");
+  }
+
+  const name = formData.get("name")?.toString();
+  const description = formData.get("description")?.toString();
+  const imageUrl = formData.get("imageUrl")?.toString();
+  const price = Number(formData.get("price") || 0);
+
+  if (!name || !description || !imageUrl || !price) {
+    throw Error("Missing required fields");
+  }
+
+  await prisma.product.create({
+    data: { name, description, imageUrl, price },
+  });
+
+  redirect("/");
+}
+
+export default async function AddProductPage() {
+  const session = await getServerSession(authOptions);
+
+  if (!session) {
+    redirect("/api/auth/signin?callbackUrl=/add-products");
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-4">
-      <h1 className="text-2xl font-bold mb-4">Add Products</h1>
-      <form action={AddProducts} className="flex flex-col gap-4 w-full max-w-md">
+    <div>
+      <h1 className="mb-3 text-lg font-bold">Add Product</h1>
+      <form action={addProduct}>
         <input
-          type="text"
+          required
           name="name"
           placeholder="Name"
-          required
-          className="p-2 border rounded"
+          className="input-bordered input mb-3 w-full"
         />
         <textarea
+          required
           name="description"
           placeholder="Description"
-          required
-          className="p-2 border rounded"
+          className="textarea-bordered textarea mb-3 w-full"
         />
         <input
-          type="url"
+          required
           name="imageUrl"
           placeholder="Image URL"
-          required
-          className="p-2 border rounded"
+          type="url"
+          className="input-bordered input mb-3 w-full"
         />
         <input
-          type="number"
+          required
           name="price"
           placeholder="Price"
-          required
-          className="p-2 border rounded"
+          type="number"
+          className="input-bordered input mb-3 w-full"
         />
-        <FormSubmitButton
-          type="submit"
-          className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700"
-        >
-          Submit
-        </FormSubmitButton>
+        <FormSubmitButton className="btn-block">Add Product</FormSubmitButton>
       </form>
     </div>
   );
-};
-
-export default Page;
+}
