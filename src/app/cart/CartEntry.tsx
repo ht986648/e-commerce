@@ -20,7 +20,7 @@ export default function CartEntry({
   const quantityOptions: JSX.Element[] = [];
   for (let i = 1; i <= 100; i++) {
     quantityOptions.push(
-      <option value={i} key={i}>
+      <option value={i.toString()} key={i}>
         {i}
       </option>
     );
@@ -37,7 +37,7 @@ export default function CartEntry({
           className="rounded-lg"
         />
         <div>
-          <Link href={"/products/" + product.id} className="font-bold">
+          <Link href={`/products/${product.id}`} className="font-bold">
             {product.name}
           </Link>
           <div>Price: {formatPrice(product.price)}</div>
@@ -45,15 +45,15 @@ export default function CartEntry({
             Quantity:
             <select
               className="select-bordered select w-full max-w-[80px]"
-              defaultValue={quantity}
+              value={quantity}
               onChange={(e) => {
                 const newQuantity = parseInt(e.currentTarget.value);
-                startTransition(async () => {
-                  await setProductQuantity(product.id, newQuantity);
+                startTransition(() => {
+                  setProductQuantity(product.id, newQuantity);
                 });
               }}
             >
-              <option value={0}>0 (Remove)</option>
+              <option value="0">0 (Remove)</option>
               {quantityOptions}
             </select>
           </div>
