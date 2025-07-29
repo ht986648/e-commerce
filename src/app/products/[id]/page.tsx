@@ -1,20 +1,20 @@
-import { prisma } from '@/lib/db/prisma';
 import { notFound } from 'next/navigation';
-import React from 'react';
+import { prisma } from '@/lib/db/prisma';
+import Image from 'next/image';
 import PriceTag from '../../../components/PriceTag';
 import AddToCartButton from './AddToCartButton';
-import Image from 'next/image';
 import { FaShoppingCart } from 'react-icons/fa';
 import incrementProductQuantityAction from './action';
+import React from 'react';
 
-interface ProductPageProps {
-  params: {
-    id: string;
-  };
-}
-
-const Page = async ({ params: { id } }: ProductPageProps) => {
-  const product = await prisma.product.findUnique({ where: { id } });
+export default async function ProductPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const product = await prisma.product.findUnique({
+    where: { id: (await params).id },
+  });
 
   if (!product) {
     notFound();
@@ -40,9 +40,9 @@ const Page = async ({ params: { id } }: ProductPageProps) => {
 
           <p className="text-sm text-gray-600">{product.description}</p>
 
-          <AddToCartButton 
-            productId={product.id} 
-            incrementProductQuantityAction={incrementProductQuantityAction} 
+          <AddToCartButton
+            productId={product.id}
+            incrementProductQuantityAction={incrementProductQuantityAction}
           />
 
           <div className="card-actions justify-end">
@@ -55,6 +55,4 @@ const Page = async ({ params: { id } }: ProductPageProps) => {
       </div>
     </div>
   );
-};
-
-export default Page;
+}

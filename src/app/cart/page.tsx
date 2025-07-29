@@ -3,6 +3,9 @@ import { formatPrice } from "@/lib/formatPrice";
 import CartEntry from "./CartEntry";
 import { setProductQuantity } from "./actions";
 
+// ✅ Mark this page as dynamic because it uses `cookies()` internally
+export const dynamic = "force-dynamic";
+
 export const metadata = {
   title: "Your Cart - Flowmazon",
 };
